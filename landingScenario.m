@@ -1,18 +1,33 @@
-function out = landingScenario(cmd, varargin)
+function varargout = landingScenario(cmd, varargin)
 % LANDINGSCENARIO Defines approach reference trajectory and touchdown evaluation.
 %
 % Sub-functions:
 %   ref = landingScenario('reference', x, h, P)
+%   landing_status = landingScenario('evaluate', state, P)
 %   [status, is_terminal, details] = landingScenario('evaluate', state, P)
 %   corridor = landingScenario('corridor', x, P)
 
 switch lower(cmd)
     case 'reference'
-        out = getReference(varargin{:});
+        varargout{1} = getReference(varargin{:});
     case 'evaluate'
-        [out.status, out.is_terminal, out.details] = evaluateStatus(varargin{:});
+        [status, is_terminal, details] = evaluateStatus(varargin{:});
+        if nargout <= 1
+            % Production single-struct interface
+            res.status      = status;
+            res.is_terminal = is_terminal;
+            res.details     = details;
+            varargout{1}    = res;
+        else
+            % Multi-variable test interface
+            varargout{1} = status;
+            varargout{2} = is_terminal;
+            if nargout >= 3
+                varargout{3} = details;
+            end
+        end
     case 'corridor'
-        out = getCorridor(varargin{:});
+        varargout{1} = getCorridor(varargin{:});
     otherwise
         error('landingScenario:UnknownCommand', 'Unknown subcommand: %s', cmd);
 end

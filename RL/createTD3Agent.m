@@ -47,37 +47,8 @@ if has_rl_toolbox
         % Q(s, a): Concatenates state and action vectors
         critic_opts = rlOptimizerOptions('LearnRate', cfg.critic_lr, 'GradientThreshold', cfg.gradient_clip);
         
-        function critic = buildCriticNet(id_str)
-            state_path = [
-                featureInputLayer(obs_dim, 'Normalization', 'none', 'Name', ['state_in_' id_str])
-                fullyConnectedLayer(cfg.hidden_units(1), 'Name', ['crit_sfc_' id_str])
-            ];
-            action_path = [
-                featureInputLayer(act_dim, 'Normalization', 'none', 'Name', ['act_in_' id_str])
-                fullyConnectedLayer(cfg.hidden_units(1), 'Name', ['crit_afc_' id_str])
-            ];
-            common_path = [
-                additionLayer(2, 'Name', ['add_' id_str])
-                reluLayer('Name', ['relu1_' id_str])
-                fullyConnectedLayer(cfg.hidden_units(2), 'Name', ['crit_fc2_' id_str])
-                reluLayer('Name', ['relu2_' id_str])
-                fullyConnectedLayer(1, 'Name', ['q_out_' id_str])
-            ];
-            
-            lg = layerGraph(state_path);
-            lg = addLayers(lg, action_path);
-            lg = addLayers(lg, common_path);
-            lg = connectLayers(lg, ['crit_sfc_' id_str], ['add_' id_str '/in1']);
-            lg = connectLayers(lg, ['crit_afc_' id_str], ['add_' id_str '/in2']);
-            
-            crit_net = dlnetwork(lg);
-            critic = rlQValueFunction(crit_net, obs_info, act_info, ...
-                'ObservationInputNames', ['state_in_' id_str], ...
-                'ActionInputNames', ['act_in_' id_str]);
-        end
-
-        critic1 = buildCriticNet('q1');
-        critic2 = buildCriticNet('q2');
+        critic1 = buildCriticNet('q1', obs_dim, act_dim, cfg, obs_info, act_info);
+        critic2 = buildCriticNet('q2', obs_dim, act_dim, cfg, obs_info, act_info);
 
         % 3. TD3 AGENT OPTIONS
         agent_opts = rlTD3AgentOptions();
@@ -104,4 +75,34 @@ end
 fprintf('[TD3 Setup] Initializing standalone pure-MATLAB TD3 agent representation.\n');
 agent = rlEngine('create_td3', cfg);
 
+end
+
+%% Helper: Critic Network Builder for MATLAB RL Toolbox
+function critic = buildCriticNet(id_str, obs_dim, act_dim, cfg, obs_info, act_info)
+    state_path = [
+        featureInputLayer(obs_dim, 'Normalization', 'none', 'Name', ['state_in_' id_str])
+        fullyConnectedLayer(cfg.hidden_units(1), 'Name', ['crit_sfc_' id_str])
+    ];
+    action_path = [
+        featureInputLayer(act_dim, 'Normalization', 'none', 'Name', ['act_in_' id_str])
+        fullyConnectedLayer(cfg.hidden_units(1), 'Name', ['crit_afc_' id_str])
+    ];
+    common_path = [
+        additionLayer(2, 'Name', ['add_' id_str])
+        reluLayer('Name', ['relu1_' id_str])
+        fullyConnectedLayer(cfg.hidden_units(2), 'Name', ['crit_fc2_' id_str])
+        reluLayer('Name', ['relu2_' id_str])
+        fullyConnectedLayer(1, 'Name', ['q_out_' id_str])
+    ];
+    
+    lg = layerGraph(state_path);
+    lg = addLayers(lg, action_path);
+    lg = addLayers(lg, common_path);
+    lg = connectLayers(lg, ['crit_sfc_' id_str], ['add_' id_str '/in1']);
+    lg = connectLayers(lg, ['crit_afc_' id_str], ['add_' id_str '/in2']);
+    
+    crit_net = dlnetwork(lg);
+    critic = rlQValueFunction(crit_net, obs_info, act_info, ...
+        'ObservationInputNames', ['state_in_' id_str], ...
+        'ActionInputNames', ['act_in_' id_str]);
 end

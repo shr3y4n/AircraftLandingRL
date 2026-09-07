@@ -127,7 +127,7 @@ CL_sep = 2.0 * sign(alpha) * (sin(alpha))^2 * cos(alpha);
 CL = (1.0 - f_stall) * CL_lin + f_stall * CL_sep;
 
 % Drag coefficient (parasite + induced + control deflection + post-stall rise)
-CD = P.CD0 + K_eff * CL^2 + P.CDdelta_e * (delta_e^2) + f_stall * (2.0 * (sin(abs(alpha)))^3);
+CD = P.CD0 + K_eff * CL^2 + P.CDdelta_e * (delta_e^2) + f_stall * (2.0 * (sin(abs(alpha)))^2);
 
 % Pitching moment coefficient
 Cm = P.Cm0 + P.Cmalpha * alpha + P.Cmdelta_e * delta_e + P.Cmq * q_hat;

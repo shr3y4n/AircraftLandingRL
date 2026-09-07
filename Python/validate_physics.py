@@ -134,7 +134,7 @@ def aircraft_dynamics(t, state, controls, wind=[0.0, 0.0, 0.0, 0.0]):
     
     CL_sep = 2.0 * np.sign(alpha) * (np.sin(alpha)**2) * np.cos(alpha)
     CL = (1.0 - f_stall) * CL_lin + f_stall * CL_sep
-    CD = P['CD0'] + K_eff * CL**2 + P['CDdelta_e'] * delta_e**2 + f_stall * (2.0 * np.sin(abs(alpha))**3)
+    CD = P['CD0'] + K_eff * CL**2 + P['CDdelta_e'] * delta_e**2 + f_stall * (2.0 * np.sin(abs(alpha))**2)
     Cm = P['Cm0'] + P['Cmalpha'] * alpha + P['Cmdelta_e'] * delta_e + P['Cmq'] * q_hat
     if f_stall > 0.01:
         Cm -= 0.5 * f_stall * np.sign(alpha)

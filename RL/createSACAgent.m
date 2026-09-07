@@ -39,36 +39,8 @@ if has_rl_toolbox
         actor = rlContinuousGaussianActor(actor_net, obs_info, act_info, ...
             'ObservationInputNames', 'obs_in', 'ActionMeanOutputNames', 'mean_and_logstd');
 
-        % 2. CRITIC NETWORKS
-        function critic = buildSACCritic(id_str)
-            state_path = [
-                featureInputLayer(obs_dim, 'Normalization', 'none', 'Name', ['s_in_' id_str])
-                fullyConnectedLayer(cfg.hidden_units(1), 'Name', ['s_fc_' id_str])
-            ];
-            action_path = [
-                featureInputLayer(act_dim, 'Normalization', 'none', 'Name', ['a_in_' id_str])
-                fullyConnectedLayer(cfg.hidden_units(1), 'Name', ['a_fc_' id_str])
-            ];
-            common_path = [
-                additionLayer(2, 'Name', ['add_' id_str])
-                reluLayer('Name', ['relu1_' id_str])
-                fullyConnectedLayer(cfg.hidden_units(2), 'Name', ['fc2_' id_str])
-                reluLayer('Name', ['relu2_' id_str])
-                fullyConnectedLayer(1, 'Name', ['q_out_' id_str])
-            ];
-            lg = layerGraph(state_path);
-            lg = addLayers(lg, action_path);
-            lg = addLayers(lg, common_path);
-            lg = connectLayers(lg, ['s_fc_' id_str], ['add_' id_str '/in1']);
-            lg = connectLayers(lg, ['a_fc_' id_str], ['add_' id_str '/in2']);
-            crit_net = dlnetwork(lg);
-            critic = rlQValueFunction(crit_net, obs_info, act_info, ...
-                'ObservationInputNames', ['s_in_' id_str], ...
-                'ActionInputNames', ['a_in_' id_str]);
-        end
-
-        critic1 = buildSACCritic('q1');
-        critic2 = buildSACCritic('q2');
+        critic1 = buildSACCritic('q1', obs_dim, act_dim, cfg, obs_info, act_info);
+        critic2 = buildSACCritic('q2', obs_dim, act_dim, cfg, obs_info, act_info);
 
         % 3. SAC AGENT OPTIONS
         agent_opts = rlSACAgentOptions();
@@ -91,4 +63,34 @@ end
 fprintf('[SAC Setup] Initializing standalone pure-MATLAB SAC agent representation.\n');
 agent = rlEngine('create_sac', cfg);
 
+end
+
+%% Helper: Critic Network Builder for MATLAB RL Toolbox
+function critic = buildSACCritic(id_str, obs_dim, act_dim, cfg, obs_info, act_info)
+    state_path = [
+        featureInputLayer(obs_dim, 'Normalization', 'none', 'Name', ['s_in_' id_str])
+        fullyConnectedLayer(cfg.hidden_units(1), 'Name', ['s_fc_' id_str])
+    ];
+    action_path = [
+        featureInputLayer(act_dim, 'Normalization', 'none', 'Name', ['a_in_' id_str])
+        fullyConnectedLayer(cfg.hidden_units(1), 'Name', ['a_fc_' id_str])
+    ];
+    common_path = [
+        additionLayer(2, 'Name', ['add_' id_str])
+        reluLayer('Name', ['relu1_' id_str])
+        fullyConnectedLayer(cfg.hidden_units(2), 'Name', ['fc2_' id_str])
+        reluLayer('Name', ['relu2_' id_str])
+        fullyConnectedLayer(1, 'Name', ['q_out_' id_str])
+    ];
+    
+    lg = layerGraph(state_path);
+    lg = addLayers(lg, action_path);
+    lg = addLayers(lg, common_path);
+    lg = connectLayers(lg, ['s_fc_' id_str], ['add_' id_str '/in1']);
+    lg = connectLayers(lg, ['a_fc_' id_str], ['add_' id_str '/in2']);
+    
+    crit_net = dlnetwork(lg);
+    critic = rlQValueFunction(crit_net, obs_info, act_info, ...
+        'ObservationInputNames', ['s_in_' id_str], ...
+        'ActionInputNames', ['a_in_' id_str]);
 end

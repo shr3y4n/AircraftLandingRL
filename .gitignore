@@ -32,3 +32,15 @@ desktop.ini
 *.log
 *.out
 *.synctex.gz
+
+# Checkpoints, generated datasets and binary model/data files
+*.mat
+checkpoints/
+Results/Data/checkpoints/
+
+# Secrets, tokens and environment files
+.env
+.env.*
+*.key
+*.token
+secrets.*
