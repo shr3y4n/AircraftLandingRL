@@ -234,3 +234,15 @@ Under nominal conditions and boundary-layer wind shear:
 1. **Lateral-Directional Dynamics**: The present model focuses rigorously on 6-state longitudinal motion ($x, h, V, \gamma, \theta, q$). Crosswind lateral drift and roll/yaw dynamics are not included and represent a natural next research extension.
 2. **Ground Contact Physics**: Ground reaction forces are represented by altitude clamping and flight-path ground alignment upon touchdown; oleo-pneumatic landing gear spring-damper dynamics are not modeled in continuous time.
 3. **Simulink Implementation**: The Simulink model file (`Simulink/aircraft_model.slx`) contains the baseline layout and is to be completed manually per the detailed specification in [`Simulink/README.md`](Simulink/README.md).
+
+
+## Copyright
+
+Copyright © 2026 Shreyan Dey. All rights reserved.
+
+This repository is provided for academic, research, and portfolio
+reference purposes. No permission is granted to reproduce, modify,
+distribute, or commercially use this code without prior written
+permission from the author.
+
+© 2026 Shreyan Dey
