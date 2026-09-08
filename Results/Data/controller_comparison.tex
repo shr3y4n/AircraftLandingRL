@@ -1,14 +1,15 @@
 % Auto-generated comparative analysis table
 \begin{table}[htbp]
 \centering
-\caption{Controller Benchmarking Performance under Wind Shear (6 m/s Headwind)}
+\caption{Controller Benchmarking Performance under Calm Air}
 \label{tab:controller_comparison}
 \begin{tabular}{l c c c c c c c}
 \hline\hline
 Controller & Status & $\Delta x_{\text{td}}$ [m] & $\dot{h}_{\text{td}}$ [m/s] & $V_{\text{td}}$ [m/s] & $\text{RMS}(e_h)$ [m] & Effort \\
 \hline
-PID        & ACCEPTABLE_TOUCHDOWN & $ -44.6$ & $1.51$ & $34.2$ & $0.90$ & $2.7$ \\
-TD3        & AERODYNAMIC_STALL & $-3292.0$ & $1.82$ & $34.8$ & $0.06$ & $0.1$ \\
+PID        & ACCEPTABLE_TOUCHDOWN & $ -12.9$ & $1.51$ & $34.1$ & $0.33$ & $1.7$ \\
+TD3        & MISSED_APPROACH_OVERSHOOT & $+800.0$ & $1.40$ & $43.3$ & $39.77$ & $13.7$ \\
+SAC        & NOSE_GEAR_COLLAPSE & $+123.8$ & $6.30$ & $61.8$ & $27.58$ & $16.3$ \\
 \hline\hline
 \end{tabular}
 \end{table}
